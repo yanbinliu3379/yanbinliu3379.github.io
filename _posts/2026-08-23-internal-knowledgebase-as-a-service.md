@@ -27,6 +27,35 @@ So we compensate afterwards. Review gates. Checklists. Templates copied once and
 
 The knowledge itself is rarely the gap. It's in the templates people copy, the naming conventions nobody can quite recite, the decision records, the runbooks, the segmentation rules, the one paragraph in a wiki that turns out to be the real contract everyone works to. It exists. It has simply never been in the room at the moment the work happens.
 
+## How far does the standard actually reach?
+
+Before anything else, it helps to know where you are. Almost every organization sits somewhere on the same ladder, and the rung is decided by one question — not what tooling you own, but how close the standard gets to the moment work happens.
+
+```mermaid
+flowchart TB
+    L0["0 — Written down<br/>The standard exists. Nobody reads it."]
+    L1["1 — Checked afterwards<br/>Review gates catch the drift, late and expensively."]
+    L2["2 — Templated<br/>Copied once at the start, then quietly diverges."]
+    L3["3 — Read at the moment of work<br/>Consulted on every request, not from memory."]
+    L4["4 — Enforced<br/>The output is checked against the current standard, deterministically."]
+    L5["5 — Recorded<br/>Every application traceable to the version that governed it."]
+
+    L0 --> L1 --> L2 --> L3 --> L4 --> L5
+
+    classDef gap fill:#F1F3F6,stroke:#5B6478,color:#1E2235
+    classDef turn fill:#FFF7ED,stroke:#EA580C,color:#1E2235
+    classDef goal fill:#F0FDFA,stroke:#0F766E,color:#1E2235
+    class L0,L1,L2 gap
+    class L3 turn
+    class L4,L5 goal
+```
+
+Levels 0 to 2 differ in effort, not in kind. The standard is consulted before the work or after it — never during.
+
+That is the whole gap. Everything from level 3 onward needs something in the room at the moment the work happens, checking against the current version rather than a remembered one. Until recently that meant a person, which is why most organizations stop at 2 and compensate with review gates.
+
+The rest of this is about getting from 2 to 4.
+
 ## What's missing isn't context. It's an operating model for it
 
 When an agent does the drafting, something changes — not because the model is clever, but because it reads. A standard consulted at the moment of work, on every request, without depending on anyone's memory or goodwill, is a different kind of object from a standard sitting on a wiki. It stops being a reference and becomes a control point — and that is available to any process whose standard is already written down.
