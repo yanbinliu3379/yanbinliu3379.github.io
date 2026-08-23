@@ -101,63 +101,42 @@ None of which makes that approach wrong. It is the right answer to a different q
 
 ```mermaid
 flowchart TB
-    U["Business user<br/>describes the problem in a paragraph<br/>no template, no platform vocabulary"]
-    A["AGENT — probabilistic<br/>runs the interview, drafts the output<br/>carries no business rules of its own"]
-    C["MCP CONNECTOR — deterministic<br/>serves the current template, returns approved options,<br/>validates the draft, verifies placement, writes back"]
-    K["KNOWLEDGE<br/>the wiki you already have<br/>owner: the business, changes weekly"]
-    P["PROCESS<br/>a skill, in prose<br/>owner: the process owner, changes rarely"]
-    R["SYSTEMS OF RECORD<br/>published request, test ticket, implementation register"]
+    U["BUSINESS USER<br/>describes the problem in a paragraph<br/>no template, no platform vocabulary"]
+    AG["AGENT ENGINE — probabilistic<br/>runs the interview, drafts the output<br/>reaches nothing except through the boundary"]
 
-    U --> A
-    A <==>|"reads live at the moment of work"| C
-    C --> K
-    C --> P
-    C ==>|"writes back"| R
+    subgraph HL["HARNESS LAYER — the control boundary"]
+        direction LR
+        SK["SKILL — the process, in prose<br/>what to ask, what never to guess, when to escalate<br/>owner: the process owner, changes rarely"]
+        MS["MCP SERVER — deterministic code<br/>live fetch, approved options, schema validation<br/>placement check, write-back"]
+    end
 
-    classDef agent fill:#EFF6FF,stroke:#1D4ED8,color:#111827
-    classDef conn fill:#F0FDFA,stroke:#0F766E,color:#111827
-    classDef store fill:#FFFFFF,stroke:#111827,color:#111827
+    subgraph BD["OUTSIDE THE BOUNDARY"]
+        direction LR
+        W["KNOWLEDGE — the wiki you already have<br/>templates, rules, naming, guardrails<br/>owner: the business, changes weekly"]
+        SR["SYSTEMS OF RECORD<br/>published request, test ticket<br/>implementation register"]
+    end
+
+    U -->|"asks"| AG
+    AG -.->|"follows the process"| SK
+    AG <==>|"tool calls, validated responses"| MS
+    MS -->|"reads live, nothing copied"| W
+    MS ==>|"writes back"| SR
+
+    classDef person fill:#EFF6FF,stroke:#1D4ED8,color:#111827
+    classDef eng fill:#FFF7ED,stroke:#EA580C,color:#111827
+    classDef harness fill:#F0FDFA,stroke:#0F766E,color:#111827
+    classDef store fill:#FFFFFF,stroke:#1D4ED8,color:#111827
     classDef rec fill:#FAFAF9,stroke:#A8A29E,color:#111827
-    class U,A agent
-    class C conn
-    class K,P store
-    class R rec
+    class U person
+    class AG eng
+    class SK,MS harness
+    class W store
+    class SR rec
+    style HL fill:#FAFFFE,stroke:#0F766E,stroke-width:3px
+    style BD fill:#FCFCFC,stroke:#A8A29E,stroke-width:2px,stroke-dasharray: 6 4
 ```
 
 *The knowledge base sits outside the harness. The connector and the skill are what wrap the model.*
-
-Same system, drawn as a control boundary rather than a flow — because the first thing an architect asks is *what sits inside the trusted layer, and what doesn't*.
-
-```mermaid
-flowchart TB
-    subgraph BD["BUSINESS DOMAIN — owned by the business"]
-        W["Wiki / docs<br/>templates, rules, naming, guardrails<br/>edited by the business, changes weekly"]
-    end
-
-    subgraph HL["HARNESS LAYER — the control boundary"]
-        SK["SKILL — prose<br/>workflow and rules<br/>what never to guess, when to stop and escalate"]
-        MS["MCP SERVER — tools<br/>live fetch, schema validation<br/>placement check, write-back"]
-    end
-
-    AG["AGENT ENGINE<br/>LLM reasoning and drafting<br/>reaches nothing except through the boundary"]
-    SR["SYSTEMS OF RECORD<br/>Jira, CMS, trackers, registers"]
-
-    W -->|"live pull, nothing copied"| MS
-    SK -.->|"governs the interview"| AG
-    AG <-->|"tool calls, validated responses"| MS
-    MS -->|"writes back"| SR
-
-    classDef biz fill:#EFF6FF,stroke:#1D4ED8,color:#111827
-    classDef harness fill:#F0FDFA,stroke:#0F766E,color:#111827
-    classDef eng fill:#FFF7ED,stroke:#EA580C,color:#111827
-    classDef rec fill:#FAFAF9,stroke:#A8A29E,color:#111827
-    class W biz
-    class SK,MS harness
-    class AG eng
-    class SR rec
-    style BD fill:#FBFDFF,stroke:#1D4ED8,stroke-width:2px
-    style HL fill:#FAFFFE,stroke:#0F766E,stroke-width:3px
-```
 
 The model sits outside that boundary and reaches nothing except through it. Everything it is allowed to know about how we work crosses the line in one direction, and everything it produces crosses back in the other — checked on the way. The model reasons but never holds a standard. The connector fetches and validates but holds no rules of its own. The skill decides the shape of the conversation. Move any one of those three across the line and the guarantees change.
 
