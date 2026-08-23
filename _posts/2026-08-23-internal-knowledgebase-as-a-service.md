@@ -11,11 +11,12 @@ tags: [ai-agents, mcp, knowledge-management, enterprise-architecture, governance
 
 ## TL;DR
 
-- **A written standard can't enforce itself.** Compliance depends on someone remembering it exists, finding the current version, and choosing to apply it.
-- **An agent changes that, because it reads.** Consulted at the moment of work, on every request, the standard stops being a reference and becomes a control point.
-- **That needs an operating model, not more context.** The **knowledge** stays on the wiki the business owns; a **connector** reads it live and checks the finished work against it; a written **skill** holds the process.
-- **The payoff:** rules change by editing a page — no developer, no release — and an incomplete request comes back as a list of what's missing, not a document with a hole in it.
-- **The limits:** a small, curated knowledge base; it only sees the systems it's connected to; and it amplifies your standard rather than fixing it.
+- **Written standards don't enforce themselves.** Whether one gets followed depends on somebody remembering it exists, finding the current version, and choosing to apply it — three chances to fail before any work starts.
+- **The cost lands late.** Review gates, rework, and inconsistent output, caught after the expensive part is already done.
+- **AI changes that for an unglamorous reason: it reads.** An assistant that consults the standard on every request turns a document nobody opens into something that actually governs the work.
+- **Control stays with the business.** The rules stay where they are today, owned and edited by the same people. Changing one means editing a page — no developer, no release, no ticket.
+- **You find out what's missing.** An incomplete request comes back as a specific list of gaps, rather than a plausible-looking document with a hole in it that nobody thinks to question.
+- **What it won't do.** It applies your standard; it can't fix a bad one. It only sees the systems it is connected to. And it suits a small, well-kept knowledge base rather than a sprawling one.
 
 ## A knowledge base can't enforce anything
 
