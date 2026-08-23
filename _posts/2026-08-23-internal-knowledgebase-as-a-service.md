@@ -13,7 +13,7 @@ tags: [ai-agents, mcp, knowledge-management, enterprise-architecture, governance
 
 - **A written standard can't enforce itself.** Compliance depends on someone remembering it exists, finding the current version, and choosing to apply it.
 - **An agent changes that, because it reads.** Consulted at the moment of work, on every request, the standard stops being a reference and becomes a control point.
-- **That needs an operating model, not more context.** The knowledge stays on the wiki the business owns; a connector reads it live and checks the finished work against it; a written skill holds the process.
+- **That needs an operating model, not more context.** The **knowledge** stays on the wiki the business owns; a **connector** reads it live and checks the finished work against it; a written **skill** holds the process.
 - **The payoff:** rules change by editing a page — no developer, no release — and an incomplete request comes back as a list of what's missing, not a document with a hole in it.
 - **The limits:** a small, curated knowledge base; it only sees the systems it's connected to; and it amplifies your standard rather than fixing it.
 
@@ -126,9 +126,44 @@ flowchart TB
 
 *The knowledge base sits outside the harness. The connector and the skill are what wrap the model.*
 
+Same system, drawn as a control boundary rather than a flow — because the first thing an architect asks is *what sits inside the trusted layer, and what doesn't*.
+
+```mermaid
+flowchart TB
+    subgraph BD["BUSINESS DOMAIN — owned by the business"]
+        W["Wiki / docs<br/>templates, rules, naming, guardrails<br/>edited by the business, changes weekly"]
+    end
+
+    subgraph HL["HARNESS LAYER — the control boundary"]
+        SK["SKILL — prose<br/>workflow and rules<br/>what never to guess, when to stop and escalate"]
+        MS["MCP SERVER — tools<br/>live fetch, schema validation<br/>placement check, write-back"]
+    end
+
+    AG["AGENT ENGINE<br/>LLM reasoning and drafting<br/>reaches nothing except through the boundary"]
+    SR["SYSTEMS OF RECORD<br/>Jira, CMS, trackers, registers"]
+
+    W -->|"live pull, nothing copied"| MS
+    SK -.->|"governs the interview"| AG
+    AG <-->|"tool calls, validated responses"| MS
+    MS -->|"writes back"| SR
+
+    classDef biz fill:#EFF6FF,stroke:#1D4ED8,color:#111827
+    classDef harness fill:#F0FDFA,stroke:#0F766E,color:#111827
+    classDef eng fill:#FFF7ED,stroke:#EA580C,color:#111827
+    classDef rec fill:#FAFAF9,stroke:#A8A29E,color:#111827
+    class W biz
+    class SK,MS harness
+    class AG eng
+    class SR rec
+    style BD fill:#FBFDFF,stroke:#1D4ED8,stroke-width:2px
+    style HL fill:#FAFFFE,stroke:#0F766E,stroke-width:3px
+```
+
+The model sits outside that boundary and reaches nothing except through it. Everything it is allowed to know about how we work crosses the line in one direction, and everything it produces crosses back in the other — checked on the way. The model reasons but never holds a standard. The connector fetches and validates but holds no rules of its own. The skill decides the shape of the conversation. Move any one of those three across the line and the guarantees change.
+
 Three layers, each with one job and one owner.
 
-**The knowledge stays where it is** — on the wiki the business already maintains. Nothing is copied, nothing is indexed. Ours is Confluence; it could be SharePoint, Notion, a docs repo. What matters is that someone owns it.
+**The knowledge stays where it is** — on the wiki the business already maintains. Nothing is copied, nothing is indexed. It could be Confluence, SharePoint, a docs repo. What matters is that someone owns it.
 
 **A connector reads it live, and checks the result against it.** An MCP server, holding no rules of its own: it fetches whatever the standard says today, offers only the answers that standard allows, then checks the finished draft against the same source. The model runs the interview; the connector decides whether the result passes. Compliance isn't something an agent can talk its way into.
 
@@ -149,9 +184,19 @@ A model on its own answers once and stops. Wrapped in the connector, the skill a
 
 Two objections land straight away. **If editing the knowledge changes what the system does, who controls it?** The same permissions and version history that already govern the standard, owned by the business rather than an IT backlog. **And if the wiki is unreachable?** Reads are cached, and when the standard can't be read the agent stops rather than guesses. The failure mode is refusal, not confident improvisation.
 
-## Where it runs out
+## Where it runs out — and the layer you add next
 
-This works because the knowledge base is small and well kept — dozens of governed items, not thousands. Grow it well past that and you need the middle approach above: proper search, so the agent gets the right paragraph rather than the whole document. That isn't a failure, it's a swap. How the knowledge gets read is plumbing, and plumbing gets replaced. The knowledge itself — curated, owned, kept current — is the part that took the work, and it outlives whatever reads it next.
+This works because the knowledge base is small and well kept — dozens of governed items, not thousands. Grow it well past that and exact fetch stops being enough on its own.
+
+The instinct is to read that as a trade-off: direct fetch *or* search. It isn't. They answer different questions, and a mature setup runs both.
+
+**Layer 1 — direct fetch.** For anything with a shape: templates, forms, pick-lists, schemas, approved option lists, the current version of a named rule. No chunking, no embedding, no relevance scoring. You ask for a specific thing and get that thing, whole and current. This is where determinism lives, and it is the only layer a compliance check can be built on.
+
+**Layer 2 — search, called as a tool.** For anything without a shape: historical cases, prior decisions, sprawling documentation, *has anyone dealt with this before*. The agent reaches for it when it needs context rather than a rule — and it doesn't matter that retrieval is approximate, because nothing is being validated against the result.
+
+The part that matters is that **the connector orchestrates both**. Search becomes another tool call behind the same boundary, subject to the same checks, rather than a second architecture bolted alongside the first. Adding Layer 2 doesn't undo Layer 1 — it stops Layer 1 being asked to do a job it was never suited for.
+
+I have only built Layer 1. Layer 2 is where this goes when the corpus outgrows it, and I would rather say that plainly than describe a system larger than the one actually running.
 
 Two things it doesn't do. It only sees the systems it's connected to, so it will never tell you that no conflict exists — it tells you what it checked and what it couldn't. And it applies your standard rather than inventing one: a contradictory standard produces bad work faster.
 
